@@ -201,6 +201,9 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       void on_objects_removed(const vector<object_id_type>& ids, const vector<const object*>& objs, const flat_set<account_id_type>& impacted_accounts);
       void on_applied_block();
 
+    void set_order_limit(uint32_t _limit){
+        _max_order_deep=_limit;
+        }
       bool _notify_remove_create = false;
       mutable fc::bloom_filter _subscribe_filter;
       std::set<account_id_type> _subscribed_accounts;
@@ -215,6 +218,8 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       boost::signals2::scoped_connection                                                                                           _pending_trx_connection;
       map< pair<asset_id_type,asset_id_type>, std::function<void(const variant&)> >      _market_subscriptions;
       graphene::chain::database&                                                                                                            _db;
+      //bitshares-ui query "get_limit_orders" api per block with limit 200, to reduce the load of data node , let data node can set max limit for api get_limit_orders
+      uint32_t                                                                                                                     _max_order_deep=100000;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -223,8 +228,14 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
 //                                                                  //
 //////////////////////////////////////////////////////////////////////
 
-database_api::database_api( graphene::chain::database& db )
-   : my( new database_api_impl( db ) ) {}
+database_api::database_api( graphene::chain::database& db,const boost::program_options::variables_map& options )
+   : my( new database_api_impl( db ) ) {
+       
+   if(options.count("max-order-limit"))
+           
+       my->set_order_limit(options["max-order-limit"].as<uint32_t>());
+
+   }
 
 database_api::~database_api() {}
 
@@ -997,12 +1008,16 @@ vector<limit_order_object> database_api_impl::get_limit_orders(asset_id_type a, 
    const auto& limit_order_idx = _db.get_index_type<limit_order_index>();
    const auto& limit_price_idx = limit_order_idx.indices().get<by_price>();
 
+   uint32_t _limit=limit;
+   if(_limit>_max_order_deep)
+      _limit=_max_order_deep;
+
    vector<limit_order_object> result;
 
    uint32_t count = 0;
    auto limit_itr = limit_price_idx.lower_bound(price::max(a,b));
    auto limit_end = limit_price_idx.upper_bound(price::min(a,b));
-   while(limit_itr != limit_end && count < limit)
+   while(limit_itr != limit_end && count < _limit)
    {
       result.push_back(*limit_itr);
       ++limit_itr;
@@ -1011,7 +1026,7 @@ vector<limit_order_object> database_api_impl::get_limit_orders(asset_id_type a, 
    count = 0;
    limit_itr = limit_price_idx.lower_bound(price::max(b,a));
    limit_end = limit_price_idx.upper_bound(price::min(b,a));
-   while(limit_itr != limit_end && count < limit)
+   while(limit_itr != limit_end && count < _limit)
    {
       result.push_back(*limit_itr);
       ++limit_itr;

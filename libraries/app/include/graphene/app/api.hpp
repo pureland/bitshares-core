@@ -45,6 +45,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <boost/program_options.hpp>
 
 namespace graphene { namespace app {
    using namespace graphene::chain;
@@ -339,7 +340,7 @@ namespace graphene { namespace app {
           * @note This must be called prior to requesting other APIs. Other APIs may not be accessible until the client
           * has sucessfully authenticated.
           */
-         bool login(const string& user, const string& password);
+         bool login(const string& user, const string& password,const boost::program_options::variables_map& options=boost::program_options::variables_map());
          /// @brief Retrieve the network block API
          fc::api<block_api> block()const;
          /// @brief Retrieve the network broadcast API
@@ -358,7 +359,7 @@ namespace graphene { namespace app {
          fc::api<graphene::debug_witness::debug_api> debug()const;
 
          /// @brief Called to enable an API, not reflected.
-         void enable_api( const string& api_name );
+         void enable_api( const string& api_name ,const boost::program_options::variables_map& options=boost::program_options::variables_map());
       private:
 
          application& _app;

@@ -117,7 +117,7 @@ struct market_trade
 class database_api
 {
    public:
-      database_api(graphene::chain::database& db);
+      database_api(graphene::chain::database& db,const boost::program_options::variables_map& options=boost::program_options::variables_map());
       ~database_api();
 
       /////////////
