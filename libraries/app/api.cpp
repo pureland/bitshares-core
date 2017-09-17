@@ -41,19 +41,19 @@
 #include <fc/smart_ref_impl.hpp>
 #include <fc/thread/future.hpp>
 
-
 namespace graphene { namespace app {
 
-    login_api::login_api(application& a)
+    login_api::login_api(application& a,const boost::program_options::variables_map& options)
     :_app(a)
     {
+        _options=&options;
     }
 
     login_api::~login_api()
     {
     }
 
-    bool login_api::login(const string& user, const string& password,const boost::program_options::variables_map& options)
+    bool login_api::login(const string& user, const string& password)
     {
        optional< api_access_info > acc = _app.get_api_access_info( user );
        if( !acc.valid() )
@@ -71,15 +71,15 @@ namespace graphene { namespace app {
        }
 
        for( const std::string& api_name : acc->allowed_apis )
-          enable_api( api_name ,options);
+          enable_api( api_name );
        return true;
     }
 
-    void login_api::enable_api( const std::string& api_name ,const boost::program_options::variables_map& options)
+    void login_api::enable_api( const std::string& api_name )
     {
        if( api_name == "database_api" )
        {
-          _database_api=std::make_shared< database_api >( std::ref( *_app.chain_database() ) ,options);
+          _database_api=std::make_shared< database_api >( std::ref( *_app.chain_database() ) ,*_options);
            
        }
        else if( api_name == "block_api" )

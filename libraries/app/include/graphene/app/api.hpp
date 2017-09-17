@@ -46,7 +46,6 @@
 #include <string>
 #include <vector>
 #include <boost/program_options.hpp>
-
 namespace graphene { namespace app {
    using namespace graphene::chain;
    using namespace graphene::market_history;
@@ -328,7 +327,7 @@ namespace graphene { namespace app {
    class login_api
    {
       public:
-         login_api(application& a);
+         login_api(application& a,const boost::program_options::variables_map& options=boost::program_options::variables_map());
          ~login_api();
 
          /**
@@ -340,7 +339,7 @@ namespace graphene { namespace app {
           * @note This must be called prior to requesting other APIs. Other APIs may not be accessible until the client
           * has sucessfully authenticated.
           */
-         bool login(const string& user, const string& password,const boost::program_options::variables_map& options=boost::program_options::variables_map());
+         bool login(const string& user, const string& password);
          /// @brief Retrieve the network block API
          fc::api<block_api> block()const;
          /// @brief Retrieve the network broadcast API
@@ -359,7 +358,7 @@ namespace graphene { namespace app {
          fc::api<graphene::debug_witness::debug_api> debug()const;
 
          /// @brief Called to enable an API, not reflected.
-         void enable_api( const string& api_name ,const boost::program_options::variables_map& options=boost::program_options::variables_map());
+         void enable_api( const string& api_name );
       private:
 
          application& _app;
@@ -371,6 +370,7 @@ namespace graphene { namespace app {
          optional< fc::api<crypto_api> > _crypto_api;
          optional< fc::api<asset_api> > _asset_api;
          optional< fc::api<graphene::debug_witness::debug_api> > _debug_api;
+         const boost::program_options::variables_map *_options=nullptr;
    };
 
 }}  // graphene::app

@@ -201,9 +201,9 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       void on_objects_removed(const vector<object_id_type>& ids, const vector<const object*>& objs, const flat_set<account_id_type>& impacted_accounts);
       void on_applied_block();
 
-    void set_order_limit(uint32_t _limit){
-        _max_order_deep=_limit;
-        }
+      void set_order_limit(uint32_t _limit){
+          _max_order_deep=_limit;
+      }
       bool _notify_remove_create = false;
       mutable fc::bloom_filter _subscribe_filter;
       std::set<account_id_type> _subscribed_accounts;

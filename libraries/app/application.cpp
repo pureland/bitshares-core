@@ -239,8 +239,8 @@ namespace detail {
       void new_connection( const fc::http::websocket_connection_ptr& c )
       {
          auto wsc = std::make_shared<fc::rpc::websocket_api_connection>(*c);
-         auto login = std::make_shared<graphene::app::login_api>( std::ref(*_self) );
-         login->enable_api("database_api",_options);
+         auto login = std::make_shared<graphene::app::login_api>( std::ref(*_self) ,*_options);
+         login->enable_api("database_api");
 
          wsc->register_api(login->database());
          wsc->register_api(fc::api<graphene::app::login_api>(login));
@@ -265,7 +265,7 @@ namespace detail {
             password = parts[1];
          }
 
-         login->login(username, password,_options);
+         login->login(username, password);
       }
 
       void reset_websocket_server()
