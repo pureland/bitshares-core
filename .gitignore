@@ -1,4 +1,4 @@
-*.a
+I*.a
 *.sw*
 
 *.cmake
@@ -41,3 +41,4 @@ object_database/*
 
 *.pyc
 *.pyo
+build/

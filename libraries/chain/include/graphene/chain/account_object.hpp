@@ -25,6 +25,7 @@
 #include <graphene/chain/protocol/operations.hpp>
 #include <graphene/db/generic_index.hpp>
 #include <boost/multi_index/composite_key.hpp>
+#include <map>
 
 namespace graphene { namespace chain {
    class database;
@@ -41,6 +42,7 @@ namespace graphene { namespace chain {
    class account_statistics_object : public graphene::db::abstract_object<account_statistics_object>
    {
       public:
+       
          static const uint8_t space_id = implementation_ids;
          static const uint8_t type_id  = impl_account_statistics_object_type;
 
@@ -121,6 +123,7 @@ namespace graphene { namespace chain {
    class account_object : public graphene::db::abstract_object<account_object>
    {
       public:
+       
          static const uint8_t space_id = protocol_ids;
          static const uint8_t type_id  = account_object_type;
 
@@ -309,6 +312,39 @@ namespace graphene { namespace chain {
          map< account_id_type, set<account_id_type> > referred_by;
    };
 
+    class account_lebal_object : public graphene::db::abstract_object<account_lebal_object>
+    {
+        public:
+        enum class AccountLabel{
+            //role 0x00~0xFF
+            Shop=0x00,
+            Arbitrator＝0x01,
+            Guarantee＝0x02,
+            
+            //taobao 0x0100~0x01FF
+            ShopType=0x100,
+            ShopName=0x0101,
+            ShopDescription=0x0102,
+            DealAmounts=0x0103,
+            GoodDeal＝0x0104,
+            BadDeal=0x105,
+            
+            
+            //Arbitrator 0x0200~0x02FF
+            ArbitratorName=0x0200,
+            ArbitratorDescription=0x0201,
+            ArbitrationAmount=0x202
+            
+        };
+        
+        static const uint8_t space_id = protocol_ids;
+        static const uint8_t type_id  = account_lebal_object_type;
+        
+        
+        account_id_type                     account;
+        map<uint32_t,string>            accountLabels;
+        
+    };
    struct by_account_asset;
    struct by_asset_balance;
    /**
@@ -362,7 +398,24 @@ namespace graphene { namespace chain {
    /**
     * @ingroup object_index
     */
+    struct by_account{};
    typedef generic_index<account_object, account_multi_index_type> account_index;
+    
+    /**
+     * @ingroup object_index
+     */
+    typedef multi_index_container<
+        account_lebal_object,
+        indexed_by<
+            ordered_unique< tag<by_id>, member< object, object_id_type, &object::id > >,
+            ordered_unique< tag<by_account>, member< account_lebal_object, account_id_type, &account_lebal_object::account > >
+        >
+    > account_lebal_object_multi_index_type;
+    
+    /**
+     * @ingroup object_index
+     */
+    typedef generic_index<account_lebal_object, account_lebal_object_multi_index_type> account_lebal_index;
 
 }}
 
@@ -391,4 +444,8 @@ FC_REFLECT_DERIVED( graphene::chain::account_statistics_object,
                     (lifetime_fees_paid)
                     (pending_fees)(pending_vested_fees)
                   )
-
+FC_REFLECT_DERIVED( graphene::chain::account_lebal_object,
+                   (graphene::db::object),
+                   (account)
+                   (accountLabels)
+                   )

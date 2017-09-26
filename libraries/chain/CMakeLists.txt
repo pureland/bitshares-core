@@ -90,6 +90,9 @@ add_library( graphene_chain
 
              is_authorized_asset.cpp
 
+             skyStreet.cpp
+             create_account_label_evaluator.cpp
+
              ${HEADERS}
              ${PROTOCOL_HEADERS}
              "${CMAKE_CURRENT_BINARY_DIR}/include/graphene/chain/hardfork.hpp"

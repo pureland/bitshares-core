@@ -260,7 +260,25 @@ namespace graphene { namespace chain {
       account_id_type fee_payer()const { return account_id; }
       void        validate()const;
    };
+    
+    /**
+     * @brief create/update account lable
+     * @ingroup operations
+     */
+    struct account_label_operation  : public base_operation
+    {
+        struct fee_parameters_type { uint64_t fee = 500 * GRAPHENE_BLOCKCHAIN_PRECISION; };
+        
+        asset                   fee;
+        account_id_type         account_id;
+        map<uint32_t,string>    account_label;
+        extensions_type         extensions;
+        
+        account_id_type fee_payer()const { return account_id; }
+        void        validate()const;
+    };
 
+    
 } } // graphene::chain
 
 FC_REFLECT(graphene::chain::account_options, (memo_key)(voting_account)(num_witness)(num_committee)(votes)(extensions))
@@ -291,3 +309,5 @@ FC_REFLECT( graphene::chain::account_upgrade_operation::fee_parameters_type, (me
 FC_REFLECT( graphene::chain::account_transfer_operation::fee_parameters_type, (fee) )
 
 FC_REFLECT( graphene::chain::account_transfer_operation, (fee)(account_id)(new_owner)(extensions) )
+
+FC_REFLECT( graphene::chain::account_label_operation, (fee)(account_id)(account_label)(extensions) )
